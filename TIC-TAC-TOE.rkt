@@ -3,7 +3,6 @@
 (require (lib "graphics.ss" "graphics"))
 (open-graphics)
 
-
 #|--------------------------------------------------------------------------------------------------------------------------------------------|#
 #|                                               Ventana para definir tamano de la matriz                                                     |#
 #|--------------------------------------------------------------------------------------------------------------------------------------------|#
@@ -32,7 +31,7 @@
                                                      (let* ([v (string->number (send inputI get-value))])  (set! cantidadX (limite v)))
                                                      (let* ([u (string->number (send inputJ get-value))])  (set! cantidadY (limite u)))
                                                      (send setMatrix show #f)))]))
-
+; limite de los de los ejes de la matriz (rechaza numeros menor a 3 o mayores a 10)
 (define (limite numero)
   (cond
     ((>= 3 numero) 3)
@@ -44,8 +43,6 @@
 #|--------------------------------------------------------------------------------------------------------------------------------------------|#
 #|                                                           ESTRUCTURA DEL JUEGO                                                             |#
 #|--------------------------------------------------------------------------------------------------------------------------------------------|#
-
-
 
 (define cantidadX 3) ; cantidad de cuadros en el eje X
 (define cantidadY 3) ; cantidad de cuadros en el eje Y
@@ -61,12 +58,20 @@
 (define z (open-viewport "TIC-TAC-TOE" (+ dimensionI 20) (+ dimensionJ 20))) ; define las dimensiones de la ventana dejando 10 pxl entre los bordes en ambos ejes
 (define p (open-pixmap "TIC/TAC/TOE" (+ dimensionI 20) (+ dimensionJ 20))) ; define una ventana oculta para poder actualizar el tablero
 
-(define u 0) ; 0 turno O ; 1 turno X
+(define u 1) ; 0 turno O ; 1 turno X
 (define h 0) ; inicial eje x
 (define v 0) ; inicial eje y
 (define margen 10)
 (define FT "Fuera del Tablero") ; variable que contiene el mensaje de Fuera del Tablero
 (define NP "No se puede poner ahi") ; variable que contiene el mensaje de Ya el campo esta ocupado
+
+; cambia de turno
+(define (cambiarTurno)
+ (cond
+   ((eq? u 2) (set! u 1))
+   ((eq? u 1) (set! u 2))
+   )
+  )
 
 ; lineas verticales
 (for ([h (in-range 10 cuadroX 80)])
@@ -78,13 +83,15 @@
   ((draw-line z)(make-posn 10 v) (make-posn (+ dimensionI 10) v) "black")
   )
 
-
 ;dibujar
 (define (dibujarMarca i j turno)
   (cond
-    ((eq? turno 0) (dibujarO i j))
+    ((eq? turno 2) (dibujarO i j))
     ((eq? turno 1) (dibujarX i j))
     )
+  (copy-viewport p z)
+  (lines)
+  (cambiarTurno)
   )
 
 ;dibujar X
@@ -94,8 +101,6 @@
     (define b (+ (* j 80) margen))
 
     ((draw-pixmap p) "C:/Users/Oska/Desktop/Repos/TIC TAC TOE/visuals/X.png" (make-posn (+ a 22) (+ b 15)))
-    (copy-viewport p z)
-      
     )
   )
 
@@ -106,9 +111,19 @@
     (define b (+ (* j 80) margen))
 
     ((draw-pixmap p) "C:/Users/Oska/Desktop/Repos/TIC TAC TOE/visuals/O.png" (make-posn (+ a 22) (+ b 15)))
-    (copy-viewport p z)
-      
     )
+  )
+
+(define (lines)
+  ; lineas verticales
+  (for ([h (in-range 10 cuadroX 80)])
+  ((draw-line z)(make-posn h 10) (make-posn h (+ dimensionJ 10)) "black")
+  )
+
+; lineas horizontales
+(for ([v (in-range 10 cuadroY 80)])
+  ((draw-line z)(make-posn 10 v) (make-posn (+ dimensionI 10) v) "black")
+  )
   )
 
 ; coodenadas del click
@@ -124,7 +139,6 @@
   (close-viewport m)
   )
 
-#|
 ;evalua posicion donde se da click y determina la accion que debe tomar
 (define (juego)
   (if (equal? (left-mouse-click? (get-mouse-click z)) #f)
@@ -132,26 +146,21 @@
       (begin
         (cond
           ((or (or (> (posn-x (query-mouse-posn z)) dimensionI) (< (posn-x (query-mouse-posn z)) margen)) (or (> (posn-y (query-mouse-posn z)) dimensionJ) (< (posn-y (query-mouse-posn z)) margen)))(msj FT))
+          (else
+           (dibujarMarca (pos (posn-x (query-mouse-posn z)))(pos (posn-y (query-mouse-posn z))) u)
+           )
           )
-        (else
-         (dibujarMarca )
-         )
         (juego)
         )
       )
   )
 
-|#
 
-;(juego)
+; corre el juego
+(juego)
 
 
-(define (cambiarTurno)
- (cond
-   ((eq? u 0) (set! u 1))
-   ((eq? u 1) (set! u 0))
-   )
-  )
+
 
 
 
