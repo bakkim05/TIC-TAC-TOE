@@ -10,27 +10,28 @@
 
 (define setMatrix (new dialog% [label "Set Matrix Dimensions"]))
 
-
+;define el eje i de la matriz
+;por medio de la expresion regular solo permite ingresar digitos al casillero
 (define inputI (new text-field% [label "i"][parent setMatrix][init-value "3"]
                     [callback
-        (λ(f ev)
+        (lambda(f ev)
           (define v (send f get-value))
           (unless (string->number v)
             (send f set-value (regexp-replace* #px"[^(3-9)]" v ""))))]))
 
 (define inputJ (new text-field% [label "j"][parent setMatrix][init-value "3"]
                     [callback
-        (λ(f ev)
+        (lambda(f ev)
           (define v (send f get-value))
           (unless (string->number v)
             (send f set-value (regexp-replace* #rx"[^(3-9)]" v ""))))]))
 
-(define button (new horizontal-pane% [parent setMatrix]))
-(define confirmButton (new button% [parent button][label "Confirm"]
+(define confirmButton (new button% [parent setMatrix][label "Confirm"]
                            [callback (lambda (b e) (when (message-box "Confirm" "Are you sure?"
                                                                      setMatrix '(yes-no))
                                                      (let* ([v (string->number (send inputI get-value))])  (set! cantidadX (limite v)))
-                                                     (let* ([u (string->number (send inputJ get-value))])  (set! cantidadY (limite u)))))]))
+                                                     (let* ([u (string->number (send inputJ get-value))])  (set! cantidadY (limite u)))
+                                                     (send setMatrix show #f)))]))
 
 (define (limite numero)
   (cond
@@ -39,9 +40,12 @@
     (else
      numero)))
 
+
 #|--------------------------------------------------------------------------------------------------------------------------------------------|#
-#|                                                                                                                                            |#
+#|                                                           ESTRUCTURA DEL JUEGO                                                             |#
 #|--------------------------------------------------------------------------------------------------------------------------------------------|#
+
+
 
 (define cantidadX 3) ; cantidad de cuadros en el eje X
 (define cantidadY 3) ; cantidad de cuadros en el eje Y
@@ -57,7 +61,7 @@
 (define z (open-viewport "TIC-TAC-TOE" (+ dimensionI 20) (+ dimensionJ 20))) ; define las dimensiones de la ventana dejando 10 pxl entre los bordes en ambos ejes
 (define p (open-pixmap "TIC/TAC/TOE" (+ dimensionI 20) (+ dimensionJ 20))) ; define una ventana oculta para poder actualizar el tablero
 
-(define u 0) ; alternar turno
+(define u 0) ; 0 turno O ; 1 turno X
 (define h 0) ; inicial eje x
 (define v 0) ; inicial eje y
 (define margen 10)
@@ -76,10 +80,10 @@
 
 
 ;dibujar
-(define (dibujarMarca i j)
+(define (dibujarMarca i j turno)
   (cond
-    ((eq? u 0) (dibujarX i j))
-    ((eq? u 1) (dibujarO i j))
+    ((eq? turno 0) (dibujarO i j))
+    ((eq? turno 1) (dibujarX i j))
     )
   )
 
@@ -141,6 +145,13 @@
 
 ;(juego)
 
+
+(define (cambiarTurno)
+ (cond
+   ((eq? u 0) (set! u 1))
+   ((eq? u 1) (set! u 0))
+   )
+  )
 
 
 
