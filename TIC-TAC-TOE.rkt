@@ -3,33 +3,50 @@
 (require (lib "graphics.ss" "graphics"))
 (open-graphics)
 
+
+#|--------------------------------------------------------------------------------------------------------------------------------------------|#
+#|                                               Ventana para definir tamano de la matriz                                                     |#
+#|--------------------------------------------------------------------------------------------------------------------------------------------|#
+
 (define setMatrix (new dialog% [label "Set Matrix Dimensions"]))
+
 
 (define inputI (new text-field% [label "i"][parent setMatrix][init-value "3"]
                     [callback
-                     (lambda (f ev)
-                       (define v (send f get-value))
-                       (unless (string->number v)
-                         (send f set-value (regexp-replace* #rx"1[0]|[3-9]" v ""))))]))
+        (λ(f ev)
+          (define v (send f get-value))
+          (unless (string->number v)
+            (send f set-value (regexp-replace* #px"[^(3-9)]" v ""))))]))
 
 (define inputJ (new text-field% [label "j"][parent setMatrix][init-value "3"]
                     [callback
-                     (lambda (f ev)
-                       (define v (send f get-value))
-                       (unless (string->number v)
-                         (send f set-value (regexp-replace* #rx"1[0]|[3-9]" v ""))))]))
+        (λ(f ev)
+          (define v (send f get-value))
+          (unless (string->number v)
+            (send f set-value (regexp-replace* #rx"[^(3-9)]" v ""))))]))
 
 (define button (new horizontal-pane% [parent setMatrix]))
 (define confirmButton (new button% [parent button][label "Confirm"]
                            [callback (lambda (b e) (when (message-box "Confirm" "Are you sure?"
                                                                      setMatrix '(yes-no))
-                                                     (let* ([v (string->number (send inputI get-value))])  (set! cantidadX v))
-                                                     (let* ([u (string->number (send inputJ get-value))])  (set! cantidadY u))))]))
+                                                     (let* ([v (string->number (send inputI get-value))])  (set! cantidadX (limite v)))
+                                                     (let* ([u (string->number (send inputJ get-value))])  (set! cantidadY (limite u)))))]))
+
+(define (limite numero)
+  (cond
+    ((>= 3 numero) 3)
+    ((<= 10 numero) 10)
+    (else
+     numero)))
+
+#|--------------------------------------------------------------------------------------------------------------------------------------------|#
+#|                                                                                                                                            |#
+#|--------------------------------------------------------------------------------------------------------------------------------------------|#
 
 (define cantidadX 3) ; cantidad de cuadros en el eje X
 (define cantidadY 3) ; cantidad de cuadros en el eje Y
 
-(send setMatrix show #t)
+(send setMatrix show #t) ; despliega la ventana de setMatrix
 
 (define dimensionI (* 80 cantidadX)) ; define el tamano de las lineas y el tablero en el eje X
 (define dimensionJ (* 80 cantidadY)) ; define el tamano de las lineas y el tablero en el eje Y
@@ -123,8 +140,6 @@
 |#
 
 ;(juego)
-
-
 
 
 
