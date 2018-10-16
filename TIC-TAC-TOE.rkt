@@ -72,7 +72,7 @@
     (define a (+ (* i 80) margen))
     (define b (+ (* j 80) margen))
 
-    ((draw-pixmap p) "C:/Users/Oska/Desktop/Repos/TIC TAC TOE/X.png" (make-posn (+ a 22) (+ b 15)))
+    ((draw-pixmap p) "C:/Users/Oska/Desktop/Repos/TIC TAC TOE/visuals/X.png" (make-posn (+ a 22) (+ b 15)))
     (copy-viewport p z)
       
     )
@@ -84,7 +84,7 @@
     (define a (+ (* i 80) margen))
     (define b (+ (* j 80) margen))
 
-    ((draw-pixmap p) "C:/Users/Oska/Desktop/Repos/TIC TAC TOE/O.png" (make-posn (+ a 22) (+ b 15)))
+    ((draw-pixmap p) "C:/Users/Oska/Desktop/Repos/TIC TAC TOE/visuals/O.png" (make-posn (+ a 22) (+ b 15)))
     (copy-viewport p z)
       
     )
