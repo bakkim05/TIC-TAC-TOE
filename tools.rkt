@@ -1,5 +1,6 @@
 #lang racket
 
+; crea una lista llena de n 0s
 (define (Crear_row cols result) 
     (cond 
         ((zero? cols) result)
@@ -7,6 +8,7 @@
         )
 )
 
+; crea una matriz llena de ceros
 (define (Crear_matriz row cols result)
     (cond 
         ((zero? row) result)
@@ -17,9 +19,10 @@
         )
 )
 
-
+; compara el valor en la posicion x y con el valor requerido
 (define (compararMatrix_val row col matrix value)
-    (cond 
+    (cond
+        ((null? matrix) matrix) 
         ((and (zero? row) (zero? col))
             (cond 
                 ((not (list? (car matrix))) 
@@ -46,6 +49,86 @@
         )
 )
 
-(define mat '((3 2 1) (2 3 1) (1 2 3)))
+; inserta un valor en la posicion de la lista dada y devuelve la lista modificada
+(define (insertar_lis lista pos elemt) 
+    (cond 
+        ((null? lista) lista)
+        ((zero? pos) 
+            (append (list elemt) (cdr lista))
+            )
+        (else 
+            (append 
+                (list (car lista)) (insertar_lis (cdr lista) (- pos 1) elemt)
+                )
+            )
+        )
+)
 
-(compararMatrix_val 2 2 mat 3)
+
+; inserta el valor en la posicion i j en una matriz
+(define (insertar col row matrix value) 
+    (cond 
+        ((null? matrix) matrix)
+        ((zero? row) 
+            (append (list (insertar_lis (car matrix) col value)) (cdr matrix))
+            )
+        (else 
+            (append 
+                (list (car matrix)) (insertar col (- row 1) (cdr matrix) value)
+                )
+            )
+        )
+)
+
+;obtiene el valor en determinada posicion en una lista
+(define (get_val lista pos) 
+    (cond 
+        ((null? lista) lista)
+        ((zero? pos) (car lista))
+        (else 
+            (get_val (cdr lista) (- pos 1))
+            )
+        )
+)
+
+;obtiene el valor en determinada posicion en una matriz
+(define (get_val_mat matriz row col)
+    (get_val (get_val matriz row) col)
+)
+
+;funcion auxiliar 
+(define (lar_list_aux lista largo)
+    (cond
+        ((null? lista) largo)
+        (else (lar_list_aux (cdr lista) (+ largo 1)))
+    )
+)
+
+;funcion para obtener el largo de una lista
+(define (lar_list lista)
+    (cond
+        ((null? lista) 0)
+        (else (lar_list_aux (cdr lista) 1))
+    )
+)
+
+;in progress
+(define (check_winner matrix) 
+    (cond 
+        ((null? matrix) matrix)
+        )
+)
+
+;in progress
+(define (check_row matrix row) 
+    (cond 
+        ((equal? row (lar_list (car matrix))) #f)
+        (else 
+            ;(check_row_aux matrix)
+            )
+        )
+)
+
+(define listin (Crear_matriz 3 3 '()))
+(define listin2 '((1 2 3) (4 5 6)))
+
