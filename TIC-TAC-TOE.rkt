@@ -11,19 +11,19 @@
 
 ;define el eje i de la matriz
 ;por medio de la expresion regular solo permite ingresar digitos al casillero
-(define inputI (new text-field% [label "i"][parent setMatrix][init-value "3"]
+(define inputI (new text-field% [label "columna"][parent setMatrix][init-value "3"]
                     [callback
         (lambda(f ev)
           (define v (send f get-value))
           (unless (string->number v)
-            (send f set-value (regexp-replace* #px"[^(3-9)]" v ""))))]))
+            (send f set-value (regexp-replace* #px"[^(0-9)]" v ""))))]))
 
-(define inputJ (new text-field% [label "j"][parent setMatrix][init-value "3"]
+(define inputJ (new text-field% [label "fila"][parent setMatrix][init-value "3"]
                     [callback
         (lambda(f ev)
           (define v (send f get-value))
           (unless (string->number v)
-            (send f set-value (regexp-replace* #rx"[^(3-9)]" v ""))))]))
+            (send f set-value (regexp-replace* #rx"[^(0-9)]" v ""))))]))
 
 (define confirmButton (new button% [parent setMatrix][label "Confirm"]
                            [callback (lambda (b e) (when (message-box "Confirm" "Are you sure?"
@@ -44,8 +44,8 @@
 #|                                                           ESTRUCTURA DEL JUEGO                                                             |#
 #|--------------------------------------------------------------------------------------------------------------------------------------------|#
 
-(define cantidadX 3) ; cantidad de cuadros en el eje X
-(define cantidadY 3) ; cantidad de cuadros en el eje Y
+(define cantidadX 3) ; cantidad de cuadros en el eje Columnas
+(define cantidadY 3) ; cantidad de cuadros en el eje Filas
 
 (send setMatrix show #t) ; despliega la ventana de setMatrix
 
@@ -58,7 +58,7 @@
 (define z (open-viewport "TIC-TAC-TOE" (+ dimensionI 20) (+ dimensionJ 20))) ; define las dimensiones de la ventana dejando 10 pxl entre los bordes en ambos ejes
 (define p (open-pixmap "TIC/TAC/TOE" (+ dimensionI 20) (+ dimensionJ 20))) ; define una ventana oculta para poder actualizar el tablero
 
-(define u 1) ; 0 turno O ; 1 turno X
+(define u 2) ; 2 turno O ; 1 turno X
 (define h 0) ; inicial eje x
 (define v 0) ; inicial eje y
 (define margen 10)
@@ -100,7 +100,7 @@
     (define a (+ (* i 80) margen))
     (define b (+ (* j 80) margen))
 
-    ((draw-pixmap p) "C:/Users/Oska/Desktop/Repos/TIC TAC TOE/visuals/X.png" (make-posn (+ a 22) (+ b 15)))
+    ((draw-pixmap p) "C:/Users/Juno/Desktop/REPOS/TIC-TAC-TOE/visuals/X.png" (make-posn (+ a 22) (+ b 15)))
     )
   )
 
@@ -110,7 +110,7 @@
     (define a (+ (* i 80) margen))
     (define b (+ (* j 80) margen))
 
-    ((draw-pixmap p) "C:/Users/Oska/Desktop/Repos/TIC TAC TOE/visuals/O.png" (make-posn (+ a 22) (+ b 15)))
+    ((draw-pixmap p) "C:/Users/Juno/Desktop/REPOS/TIC-TAC-TOE/visuals/O.png" (make-posn (+ a 22) (+ b 15)))
     )
   )
 
