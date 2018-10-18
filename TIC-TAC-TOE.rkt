@@ -11,14 +11,14 @@
 
 ;define el eje i de la matriz
 ;por medio de la expresion regular solo permite ingresar digitos al casillero
-(define inputI (new text-field% [label "i"][parent setMatrix][init-value "3"]
+(define inputI (new text-field% [label "Filas"][parent setMatrix][init-value "3"]
                     [callback
         (lambda(f ev)
           (define v (send f get-value))
           (unless (string->number v)
             (send f set-value (regexp-replace* #px"[^(3-9)]" v ""))))]))
 
-(define inputJ (new text-field% [label "j"][parent setMatrix][init-value "3"]
+(define inputJ (new text-field% [label "Colu"][parent setMatrix][init-value "3"]
                     [callback
         (lambda(f ev)
           (define v (send f get-value))
