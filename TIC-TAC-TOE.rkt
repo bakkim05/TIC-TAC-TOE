@@ -39,6 +39,105 @@
     (else
      numero)))
 
+#|--------------------------------------------------------------------------------------------------------------------------------------------|#
+#|                                                           LOGICA DEL JUEGO                                                                 |#
+#|--------------------------------------------------------------------------------------------------------------------------------------------|#
+
+; crea una lista llena de n 0s      [READY]
+(define (Crear_row cols result) 
+    (cond 
+        ((zero? cols) result)
+        (else (Crear_row (- cols 1) (append result (list 0))))
+        )
+)
+
+; crea una matriz llena de ceros       [READY]
+(define (Crear_matriz row cols result)
+    (cond 
+        ((zero? row) (set! mInicial result))
+        (else 
+            (Crear_matriz (- row 1) cols (append result (list (Crear_row cols '())))
+                )
+            )
+        )
+)
+
+; compara el valor en la posicion x y con el valor requerido       
+(define (compararMatrix_val row col matrix value)
+    (cond
+        ((null? matrix) matrix) 
+        ((and (zero? row) (zero? col))
+            (cond 
+                ((not (list? (car matrix))) 
+                    (equal? (car matrix) value)
+                    )
+                (else 
+                    (equal? (caar matrix) value)
+                    )
+                )
+            )
+        ((not (zero? row)) 
+            (compararMatrix_val (- row 1) col (cdr matrix) value)
+            )
+        ((zero? row) 
+            (cond 
+                ((list? (car matrix)) 
+                    (compararMatrix_val row col (car matrix) value)
+                    )
+                ((not (zero? col)) 
+                    (compararMatrix_val row (- col 1) (cdr matrix) value)
+                    )
+                )
+            )
+        )
+)
+
+; inserta un valor en la posicion de la lista dada y devuelve la lista modificada
+(define (insertar_lis lista pos elemt) 
+    (cond 
+        ((null? lista) lista)
+        ((zero? pos) 
+            (append (list elemt) (cdr lista))
+            )
+        (else 
+            (append 
+                (list (car lista)) (insertar_lis (cdr lista) (- pos 1) elemt)
+                )
+            )
+        )
+)
+
+; inserta el valor en la posicion i j en una matriz
+(define (insertar col row matrix value) 
+    (cond 
+        ((null? matrix) matrix)
+        ((zero? row) 
+            (set! mInicial (append (list (insertar_lis (car matrix) col value)) (cdr matrix)))
+            )
+        (else 
+            (set! mInicial (append (list (car matrix)) (insertar col (- row 1) (cdr matrix) value)))
+            )
+        )
+)
+
+;obtiene el valor en determinada posicion en una lista
+(define (get_val lista pos) 
+    (cond 
+        ((null? lista) lista)
+        ((zero? pos) (car lista))
+        (else 
+            (get_val (cdr lista) (- pos 1))
+            )
+        )
+)
+
+;obtiene el valor en determinada posicion en una matriz
+(define (get_val_mat matriz row col)
+    (get_val (get_val matriz row) col)
+)
+
+
+
 
 #|--------------------------------------------------------------------------------------------------------------------------------------------|#
 #|                                                           ESTRUCTURA DEL JUEGO                                                             |#
@@ -46,6 +145,7 @@
 
 (define cantidadX 3) ; cantidad de cuadros en el eje Columnas
 (define cantidadY 3) ; cantidad de cuadros en el eje Filas
+(define mInicial '()) ; matriz vacia
 
 (send setMatrix show #t) ; despliega la ventana de setMatrix
 
@@ -100,8 +200,9 @@
     (define a (+ (* i 80) margen))
     (define b (+ (* j 80) margen))
 
-    ((draw-pixmap p) "C:/Users/Juno/Desktop/REPOS/TIC-TAC-TOE/visuals/X.png" (make-posn (+ a 22) (+ b 15)))
+    ((draw-pixmap p) "C:/Users/Oska/Desktop/REPOS/TIC TAC TOE/visuals/X.png" (make-posn (+ a 22) (+ b 15)))
     )
+  (insertar (pos (posn-x (query-mouse-posn z))) (pos (posn-y (query-mouse-posn z))) mInicial "1")
   )
 
 ;dibujar O
@@ -110,8 +211,9 @@
     (define a (+ (* i 80) margen))
     (define b (+ (* j 80) margen))
 
-    ((draw-pixmap p) "C:/Users/Juno/Desktop/REPOS/TIC-TAC-TOE/visuals/O.png" (make-posn (+ a 22) (+ b 15)))
+    ((draw-pixmap p) "C:/Users/Oska/Desktop/REPOS/TIC TAC TOE/visuals/O.png" (make-posn (+ a 22) (+ b 15)))
     )
+  (insertar (pos (posn-x (query-mouse-posn z))) (pos (posn-y (query-mouse-posn z))) mInicial "2")
   )
 
 (define (lines)
@@ -146,10 +248,12 @@
       (begin
         (cond
           ((or (or (> (posn-x (query-mouse-posn z)) dimensionI) (< (posn-x (query-mouse-posn z)) margen)) (or (> (posn-y (query-mouse-posn z)) dimensionJ) (< (posn-y (query-mouse-posn z)) margen)))(msj FT))
+          ((or (compararMatrix_val (pos (posn-y (query-mouse-posn z))) (pos (posn-x (query-mouse-posn z))) mInicial "1") (compararMatrix_val (pos (posn-x (query-mouse-posn z))) (pos (posn-y (query-mouse-posn z))) mInicial "2")) (msj NP))
           (else
            (dibujarMarca (pos (posn-x (query-mouse-posn z)))(pos (posn-y (query-mouse-posn z))) u)
            )
           )
+        (print mInicial)
         (juego)
         )
       )
@@ -157,10 +261,13 @@
 
 
 ; corre el juego
+(Crear_matriz cantidadY cantidadX '())
+(print mInicial)
 (juego)
 
 
-
+; '(("1" "2" "1") ("2" "1" "2") ("1" "2" "1"))
+; (compararMatrix_val 0 2 '(("1" "2" "1") ("2" "1" "2") ("1" "2" "1")) "1")
 
 
 
