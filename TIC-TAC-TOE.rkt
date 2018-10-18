@@ -18,7 +18,7 @@
           (unless (string->number v)
             (send f set-value (regexp-replace* #px"[^(0-9)]" v ""))))]))
 
-(define inputJ (new text-field% [label "fila"][parent setMatrix][init-value "3"]
+(define inputJ (new text-field% [label "fila"][parent setMatrix][init-value "5"]
                     [callback
         (lambda(f ev)
           (define v (send f get-value))
@@ -54,7 +54,7 @@
 ; crea una matriz llena de ceros       [READY]
 (define (Crear_matriz row cols result)
     (cond 
-        ((zero? row) (set! mInicial result))
+        ((zero? row)  result)
         (else 
             (Crear_matriz (- row 1) cols (append result (list (Crear_row cols '())))
                 )
@@ -112,10 +112,10 @@
     (cond 
         ((null? matrix) matrix)
         ((zero? row) 
-            (set! mInicial (append (list (insertar_lis (car matrix) col value)) (cdr matrix)))
+            (append (list (insertar_lis (car matrix) col value)) (cdr matrix))
             )
         (else 
-            (set! mInicial (append (list (car matrix)) (insertar col (- row 1) (cdr matrix) value)))
+            (append (list (car matrix)) (insertar col (- row 1) (cdr matrix) value))
             )
         )
 )
@@ -143,77 +143,71 @@
 #|                                                           ESTRUCTURA DEL JUEGO                                                             |#
 #|--------------------------------------------------------------------------------------------------------------------------------------------|#
 
-(define cantidadX 3) ; cantidad de cuadros en el eje Columnas
-(define cantidadY 3) ; cantidad de cuadros en el eje Filas
-(define mInicial '()) ; matriz vacia
+(define cantidadX 3) ; cantidad de cuadros en el eje FILAS
+(define cantidadY 3) ; cantidad de cuadros en el eje COLUMNAS
+
 
 (send setMatrix show #t) ; despliega la ventana de setMatrix
 
-(define dimensionI (* 80 cantidadX)) ; define el tamano de las lineas y el tablero en el eje X
-(define dimensionJ (* 80 cantidadY)) ; define el tamano de las lineas y el tablero en el eje Y
+(define dimensionI (* 80 cantidadX)) ; define el tamano de las lineas y el tablero en el eje de las FILAS
+(define dimensionJ (* 80 cantidadY)) ; define el tamano de las lineas y el tablero en el eje de las COLUMNAS
 
-(define cuadroX (* 80 (+ 1 cantidadX))) ; rango X el cual se utiliza para las lineas verticales del tablero
-(define cuadroY (* 80 (+ 1 cantidadY))) ; rango Y el cual se utiliza para las lineas horizontales del tablerO
+(define cuadroX (* 80 (+ 1 cantidadX))) ; rango el cual se utiliza para las lineas horizontales del tablerO (FILAS)
+(define cuadroY (* 80 (+ 1 cantidadY))) ; rango el cual se utiliza para las lineas verticales del tablero (COLUMNAS)
 
 (define z (open-viewport "TIC-TAC-TOE" (+ dimensionI 20) (+ dimensionJ 20))) ; define las dimensiones de la ventana dejando 10 pxl entre los bordes en ambos ejes
 (define p (open-pixmap "TIC/TAC/TOE" (+ dimensionI 20) (+ dimensionJ 20))) ; define una ventana oculta para poder actualizar el tablero
 
-(define u 2) ; 2 turno O ; 1 turno X
-(define h 0) ; inicial eje x
-(define v 0) ; inicial eje y
+(define h 0) ; inicial eje FILAS
+(define v 0) ; inicial eje COLUMNAS
 (define margen 10)
 (define FT "Fuera del Tablero") ; variable que contiene el mensaje de Fuera del Tablero
 (define NP "No se puede poner ahi") ; variable que contiene el mensaje de Ya el campo esta ocupado
 
-; cambia de turno
-(define (cambiarTurno)
- (cond
-   ((eq? u 2) (set! u 1))
-   ((eq? u 1) (set! u 2))
-   )
-  )
-
 ; lineas verticales
-(for ([h (in-range 10 cuadroX 80)])
+(for ([v (in-range 10 cuadroX 80)])
   ((draw-line z)(make-posn h 10) (make-posn h (+ dimensionJ 10)) "black")
   )
 
 ; lineas horizontales
-(for ([v (in-range 10 cuadroY 80)])
+(for ([h (in-range 10 cuadroY 80)])
   ((draw-line z)(make-posn 10 v) (make-posn (+ dimensionI 10) v) "black")
   )
 
 ;dibujar
-(define (dibujarMarca i j turno)
+(define (dibujarMarca i j turno mInicial)
   (cond
-    ((eq? turno 2) (dibujarO i j))
-    ((eq? turno 1) (dibujarX i j))
+    ((eq? turno 2) (dibujarO i j turno mInicial))
+    ((eq? turno 1) (dibujarX i j turno mInicial))
     )
-  (copy-viewport p z)
-  (lines)
-  (cambiarTurno)
+  (copy-viewport p z) ;aqui posiblemente va haber problemas de graficos
+  (lines) ; al igual que aqui
   )
 
 ;dibujar X
-(define (dibujarX i j)
+(define (dibujarX i j turno mInicial)
     (begin
     (define a (+ (* i 80) margen))
     (define b (+ (* j 80) margen))
 
     ((draw-pixmap p) "C:/Users/Oska/Desktop/REPOS/TIC TAC TOE/visuals/X.png" (make-posn (+ a 22) (+ b 15)))
+    (copy-viewport p z)
+    (lines)
     )
-  (insertar (pos (posn-x (query-mouse-posn z))) (pos (posn-y (query-mouse-posn z))) mInicial "1")
+  (juego (insertar (pos (posn-x (query-mouse-posn z))) (pos (posn-y (query-mouse-posn z))) mInicial 1) (+ turno 1))
   )
 
 ;dibujar O
-(define (dibujarO i j)
+(define (dibujarO i j turno mInicial)
     (begin
     (define a (+ (* i 80) margen))
     (define b (+ (* j 80) margen))
 
     ((draw-pixmap p) "C:/Users/Oska/Desktop/REPOS/TIC TAC TOE/visuals/O.png" (make-posn (+ a 22) (+ b 15)))
+    (copy-viewport p z)
+    (lines)
     )
-  (insertar (pos (posn-x (query-mouse-posn z))) (pos (posn-y (query-mouse-posn z))) mInicial "2")
+  (juego (insertar (pos (posn-x (query-mouse-posn z))) (pos (posn-y (query-mouse-posn z))) mInicial 1) (- turno 1))
   )
 
 (define (lines)
@@ -237,33 +231,41 @@
 (define (msj text)
   (define m (open-viewport "Alerta" 300 50))
   ((draw-string m) (make-posn 50 20) text "red")
-  (sleep 2)
+  (sleep 1)
   (close-viewport m)
   )
 
-;evalua posicion donde se da click y determina la accion que debe tomar
-(define (juego)
-  (if (equal? (left-mouse-click? (get-mouse-click z)) #f)
-      (juego)
-      (begin
-        (cond
-          ((or (or (> (posn-x (query-mouse-posn z)) dimensionI) (< (posn-x (query-mouse-posn z)) margen)) (or (> (posn-y (query-mouse-posn z)) dimensionJ) (< (posn-y (query-mouse-posn z)) margen)))(msj FT))
-          ((or (compararMatrix_val (pos (posn-y (query-mouse-posn z))) (pos (posn-x (query-mouse-posn z))) mInicial "1") (compararMatrix_val (pos (posn-x (query-mouse-posn z))) (pos (posn-y (query-mouse-posn z))) mInicial "2")) (msj NP))
-          (else
-           (dibujarMarca (pos (posn-x (query-mouse-posn z)))(pos (posn-y (query-mouse-posn z))) u)
-           )
-          )
-        (print mInicial)
-        (juego)
-        )
-      )
+; comienza a jugar despues de un click
+(define (juego mInicial turno)
+  (cond
+    ((equal? (left-mouse-click? (get-mouse-click z)) #f) juego mInicial turno)
+    (else
+     (juego_aux mInicial turno)
+     )
+    )
+
+  )
+
+;funcion auxiliar para comenzar el juego
+(define (juego_aux mInicial turno)
+  (print mInicial)
+  (reglas mInicial turno)
+  )
+
+; verifica las reglas
+(define (reglas mInicial turno)
+  (cond
+    ((or (or (> (posn-x (query-mouse-posn z)) dimensionI) (< (posn-x (query-mouse-posn z)) margen)) (or (> (posn-y (query-mouse-posn z)) dimensionJ) (< (posn-y (query-mouse-posn z)) margen)))(msj FT) (juego mInicial turno))
+    ((or (compararMatrix_val (pos (posn-y (query-mouse-posn z))) (pos (posn-x (query-mouse-posn z))) mInicial 1) (compararMatrix_val (pos (posn-x (query-mouse-posn z))) (pos (posn-y (query-mouse-posn z))) mInicial 2)) (msj NP) (juego mInicial turno))
+    (else
+     (dibujarMarca (pos (posn-x (query-mouse-posn z)))(pos (posn-y (query-mouse-posn z))) turno mInicial)
+     )
+    )
   )
 
 
 ; corre el juego
-(Crear_matriz cantidadY cantidadX '())
-(print mInicial)
-(juego)
+(juego (Crear_matriz cantidadY cantidadX '()) 2)
 
 
 ; '(("1" "2" "1") ("2" "1" "2") ("1" "2" "1"))
