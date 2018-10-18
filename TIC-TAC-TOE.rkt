@@ -43,7 +43,7 @@
 #|                                                           LOGICA DEL JUEGO                                                                 |#
 #|--------------------------------------------------------------------------------------------------------------------------------------------|#
 
-; crea una lista llena de n 0s      [READY]
+; crea una lista llena de n 0s
 (define (Crear_row cols result) 
     (cond 
         ((zero? cols) result)
@@ -51,10 +51,10 @@
         )
 )
 
-; crea una matriz llena de ceros       [READY]
+; crea una matriz llena de ceros
 (define (Crear_matriz row cols result)
     (cond 
-        ((zero? row)  result)
+        ((zero? row) result)
         (else 
             (Crear_matriz (- row 1) cols (append result (list (Crear_row cols '())))
                 )
@@ -62,7 +62,7 @@
         )
 )
 
-; compara el valor en la posicion x y con el valor requerido       
+; compara el valor en la posicion x y con el valor requerido
 (define (compararMatrix_val row col matrix value)
     (cond
         ((null? matrix) matrix) 
@@ -115,30 +115,12 @@
             (append (list (insertar_lis (car matrix) col value)) (cdr matrix))
             )
         (else 
-            (append (list (car matrix)) (insertar col (- row 1) (cdr matrix) value))
+            (append 
+                (list (car matrix)) (insertar col (- row 1) (cdr matrix) value)
+                )
             )
         )
 )
-
-;obtiene el valor en determinada posicion en una lista
-(define (get_val lista pos) 
-    (cond 
-        ((null? lista) lista)
-        ((zero? pos) (car lista))
-        (else 
-            (get_val (cdr lista) (- pos 1))
-            )
-        )
-)
-
-;obtiene el valor en determinada posicion en una matriz
-(define (get_val_mat matriz row col)
-    (get_val (get_val matriz row) col)
-)
-
-
-
-
 #|--------------------------------------------------------------------------------------------------------------------------------------------|#
 #|                                                           ESTRUCTURA DEL JUEGO                                                             |#
 #|--------------------------------------------------------------------------------------------------------------------------------------------|#
@@ -165,12 +147,12 @@
 (define NP "No se puede poner ahi") ; variable que contiene el mensaje de Ya el campo esta ocupado
 
 ; lineas verticales
-(for ([v (in-range 10 cuadroX 80)])
+(for ([h (in-range 10 cuadroX 80)])
   ((draw-line z)(make-posn h 10) (make-posn h (+ dimensionJ 10)) "black")
   )
 
 ; lineas horizontales
-(for ([h (in-range 10 cuadroY 80)])
+(for ([v (in-range 10 cuadroY 80)])
   ((draw-line z)(make-posn 10 v) (make-posn (+ dimensionI 10) v) "black")
   )
 
@@ -193,6 +175,7 @@
     ((draw-pixmap p) "C:/Users/Oska/Desktop/REPOS/TIC TAC TOE/visuals/X.png" (make-posn (+ a 22) (+ b 15)))
     (copy-viewport p z)
     (lines)
+    (sleep 1)
     )
   (juego (insertar (pos (posn-x (query-mouse-posn z))) (pos (posn-y (query-mouse-posn z))) mInicial 1) (+ turno 1))
   )
@@ -206,8 +189,9 @@
     ((draw-pixmap p) "C:/Users/Oska/Desktop/REPOS/TIC TAC TOE/visuals/O.png" (make-posn (+ a 22) (+ b 15)))
     (copy-viewport p z)
     (lines)
+    (sleep 1)
     )
-  (juego (insertar (pos (posn-x (query-mouse-posn z))) (pos (posn-y (query-mouse-posn z))) mInicial 1) (- turno 1))
+  (juego (insertar (pos (posn-x (query-mouse-posn z))) (pos (posn-y (query-mouse-posn z))) mInicial 2) (- turno 1))
   )
 
 (define (lines)
@@ -231,14 +215,15 @@
 (define (msj text)
   (define m (open-viewport "Alerta" 300 50))
   ((draw-string m) (make-posn 50 20) text "red")
-  (sleep 1)
+  (sleep 2)
   (close-viewport m)
   )
 
 ; comienza a jugar despues de un click
 (define (juego mInicial turno)
+  (print mInicial)
   (cond
-    ((equal? (left-mouse-click? (get-mouse-click z)) #f) juego mInicial turno)
+    ((equal? (left-mouse-click? (get-mouse-click z)) #f) (juego mInicial turno))
     (else
      (juego_aux mInicial turno)
      )
@@ -248,7 +233,6 @@
 
 ;funcion auxiliar para comenzar el juego
 (define (juego_aux mInicial turno)
-  (print mInicial)
   (reglas mInicial turno)
   )
 
@@ -256,7 +240,7 @@
 (define (reglas mInicial turno)
   (cond
     ((or (or (> (posn-x (query-mouse-posn z)) dimensionI) (< (posn-x (query-mouse-posn z)) margen)) (or (> (posn-y (query-mouse-posn z)) dimensionJ) (< (posn-y (query-mouse-posn z)) margen)))(msj FT) (juego mInicial turno))
-    ((or (compararMatrix_val (pos (posn-y (query-mouse-posn z))) (pos (posn-x (query-mouse-posn z))) mInicial 1) (compararMatrix_val (pos (posn-x (query-mouse-posn z))) (pos (posn-y (query-mouse-posn z))) mInicial 2)) (msj NP) (juego mInicial turno))
+    ((or(compararMatrix_val (pos (posn-x (query-mouse-posn z))) (pos (posn-y (query-mouse-posn z))) mInicial 1)(compararMatrix_val (pos (posn-x (query-mouse-posn z))) (pos (posn-y (query-mouse-posn z))) mInicial 2)) (msj NP) (juego mInicial turno))
     (else
      (dibujarMarca (pos (posn-x (query-mouse-posn z)))(pos (posn-y (query-mouse-posn z))) turno mInicial)
      )
@@ -266,13 +250,6 @@
 
 ; corre el juego
 (juego (Crear_matriz cantidadY cantidadX '()) 2)
-
-
-; '(("1" "2" "1") ("2" "1" "2") ("1" "2" "1"))
-; (compararMatrix_val 0 2 '(("1" "2" "1") ("2" "1" "2") ("1" "2" "1")) "1")
-
-
-
 
 
 
