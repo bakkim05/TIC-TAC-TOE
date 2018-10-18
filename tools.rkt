@@ -111,6 +111,7 @@
     )
 )
 
+;funcion que devuelve la fila de una matriz. Recibe la matriz y el indice de la fila
 (define (get_row matrix nrow) 
     (cond 
         ((zero? nrow) (car matrix))
@@ -120,6 +121,7 @@
         )
 )
 
+;funcion auxiliar que recibe la fila, el valor a comprobar y el indice para recorrer la fila
 (define (check_row_aux row value pos) 
     (cond 
         ((zero? pos) #t)
@@ -132,6 +134,7 @@
         )
 )
 
+;verifica que en toda la fila exista el mismo valor
 (define (check_row matrix row) 
     (cond 
         ((equal? row (lar_list (car matrix))) #f)
@@ -143,6 +146,8 @@
         )
 )
 
+;funcion que itera sobre las filas de la matris para verificar si existe algun 
+;ganador. Recibe la matriz y el indice de la fila
 (define (check_winner_row_aux matrix row)   
     (cond 
         ((equal? row (lar_list matrix)) #f)
@@ -153,6 +158,7 @@
         )
 )
 
+;funcion que elimina la primer columna de la matris, recibe la matriz original y una lista vacia
 (define (get_rest mat result)
     (cond 
         ((null? mat) result)
@@ -163,6 +169,7 @@
     )
 )
 
+;funcion auxiliar para obtener la columna, recibe la matriz y una lista vacia
 (define (get_col_aux matrix result) 
     (cond 
         ((null? matrix) result)
@@ -172,6 +179,7 @@
         )
 )
 
+;funcion para obtener alguna columna de la matris. Recibe la matris y el indice de la columna
 (define (get_col matrix ncol) 
     (cond 
         ((zero? ncol) (get_col_aux matrix '()))
@@ -181,11 +189,12 @@
         )
 )
 
-(define (check_col_aux row value pos) 
+;funcion auxiliar que recibe la columna, el valor para compara y el indice
+(define (check_col_aux col value pos) 
     (cond 
         ((zero? pos) #t)
-        ((equal? (get_val row pos) value) 
-            (check_col_aux row value (- pos 1))
+        ((equal? (get_val col pos) value) 
+            (check_col_aux col value (- pos 1))
             )
         (else 
             #f
@@ -193,6 +202,8 @@
         )
 )
 
+;funcion para verificar si toda la columna posee el mismo valor, recibe la matris
+;y el indice de la columna
 (define (check_col matrix col) 
     (cond 
         ((equal? col (lar_list matrix)) #f)
@@ -204,6 +215,8 @@
         )
 )
 
+;funcion auxiliar para iterar sobre las columnas de la matris para buscar si hay
+;un gandor, recibe la matris y el numero de la columna
 (define (check_winner_col_aux matrix col) 
     (cond 
         ((equal? col (lar_list matrix)) #f)
@@ -214,6 +227,7 @@
         )
 )
 
+;funcion auxiliar para obtener la diagonal desde arriba bajando hacia la derecha
 (define (get_diag_top_aux matrix row col result) 
     (cond 
         ((or 
@@ -225,6 +239,8 @@
         )
 )
 
+;funcion para obtener la diagonal, recibe la matris y el indice de columna para luego
+;ir dezplazando
 (define (get_diag_top matrix col) 
     (cond 
         ((> col (- (lar_list (car matrix)) 3)) '())
@@ -234,6 +250,7 @@
         )
 )
 
+;funcion auxiliar para obtener la diagonal desde abajo subiendo hacia la derecha
 (define (get_diag_bot_aux matrix row col result) 
     (cond 
         ((or 
@@ -245,6 +262,8 @@
         )
 )
 
+;funcion para obtener la diagonal desde abajo hacia la derecha, recibe la matris y
+;la fila desde donde empieza la diagonal
 (define (get_diag_bot matrix row) 
     (cond 
         ((< row (- (lar_list matrix) 3)) '())
@@ -254,18 +273,86 @@
         )
 )
 
+;funcion auxiliar para verificar si existe
+;algun ganador
+(define (check_diag_top_aux diag value pos) 
+    (cond 
+        ((zero? pos) #t)
+        ((equal? (get_val diag pos) value) 
+            (check_diag_top_aux diag value (- pos 1))
+            )
+        (else #f)
+    )
+)
 
+;funcion para verificar si toda la diagonal contiene el mismo symgolo
+(define (check_diag_top matrix diag) 
+    (cond 
+        ((equal? diag (lar_list matrix)) #f)
+        (else 
+            (check_diag_top_aux (get_diag_top matrix diag) (get_val (get_diag_top matrix diag) 0) 
+                (- (lar_list (get_diag_top matrix diag)) 1)
+                )
+            )
+        )
+)  
 
+;funcion auxiliar para iterar sobre las diagonales de la matriz
+(define (check_winner_diag_top_aux matrix diag) 
+    (cond 
+        ((> diag (- (lar_list (car matrix)) 3)) #f)
+        ((not (check_diag_top matrix diag)) 
+            (check_winner_diag_top_aux matrix (+ diag 1))
+            )
+        (else #t)
+        )
+)
+
+;funcion auxiliar para verificar si existe
+;algun ganador
+(define (check_diag_bot_aux diag value pos) 
+    (cond 
+        ((zero? pos) #t)
+        ((equal? (get_val diag pos) value) 
+            (check_diag_bot_aux diag value (- pos 1))
+            )
+        (else #f)
+    )
+)
+
+;funcion para verificar el valor de la diagonal
+(define (check_diag_bot matrix diag) 
+    (cond 
+        ((equal? diag (lar_list matrix)) #f)
+        (else 
+            (check_diag_bot_aux (get_diag_bot matrix diag) (get_val (get_diag_bot matrix diag) 0) 
+                (- (lar_list (get_diag_bot matrix diag)) 1)
+                )
+            )
+        )
+)
+
+;funcion para iterar sobre las diagonales para verificar el valor de la diagonal
+;vista desde abajo hacia arriba 
+(define (check_winner_diag_bot_aux matrix diag) 
+    (cond 
+        ((equal? diag -1) #f)
+        ((not (check_diag_bot matrix diag)) 
+            (check_winner_diag_bot_aux matrix (- diag 1))
+            )
+        (else #t)
+        )
+)
+
+;funcion para ver si existe algun jugador contemplando ultima jugada
 (define (check_winner matrix)
     (cond 
         ((check_winner_row_aux matrix 0) #t)
         ((check_winner_col_aux matrix 0) #t)
-        ;((check_winner_diag_aux matrix 0) #t)
+        ((check_winner_diag_top_aux matrix 0) #t)
+        ((check_winner_diag_bot_aux matrix (lar_list matrix)) #t)
         (else #f)
         )
 )
 
 
-(define mat '((1 0 4) (0 3 0) (2 0 5) (6 7 8)))
-
-(get_diag_bot mat (- (lar_list mat) 2))
