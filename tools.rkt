@@ -9,11 +9,11 @@
 )
 
 ; crea una matriz llena de ceros
-(define (Crear_matriz row cols result)
+(define (Crear_matrix row cols result)
     (cond 
         ((zero? row) result)
         (else 
-            (Crear_matriz (- row 1) cols (append result (list (Crear_row cols '())))
+            (Crear_matrix (- row 1) cols (append result (list (Crear_row cols '())))
                 )
             )
         )
@@ -64,7 +64,6 @@
         )
 )
 
-
 ; inserta el valor en la posicion i j en una matriz
 (define (insertar col row matrix value) 
     (cond 
@@ -92,8 +91,8 @@
 )
 
 ;obtiene el valor en determinada posicion en una matriz
-(define (get_val_mat matriz row col)
-    (get_val (get_val matriz row) col)
+(define (get_val_mat matrix row col)
+    (get_val (get_val matrix row) col)
 )
 
 ;funcion auxiliar 
@@ -121,29 +120,152 @@
         )
 )
 
-#|
-;in progress
-(define (check_winner matrix) 
+(define (check_row_aux row value pos) 
     (cond 
-        ((null? matrix) matrix)
-        )
-)
-
-|#
-
-;in progress
-(define (check_row matrix row) 
-    (cond 
-        ((equal? row (lar_list (car matrix))) #f)
+        ((zero? pos) #t)
+        ((equal? (get_val row pos) value) 
+            (check_row_aux row value (- pos 1))
+            )
         (else 
-            
+            #f
             )
         )
 )
 
-(define listin (Crear_matriz 3 3 '()))
-(define listin2 '((1 2 3) (4 5 6)))
-(define mat '((1 2 1) (2 1 2) (1 2 1)))
+(define (check_row matrix row) 
+    (cond 
+        ((equal? row (lar_list (car matrix))) #f)
+        (else 
+            (check_row_aux (get_row matrix row) (get_val (get_row matrix row) 0) 
+                (- (lar_list (get_row matrix row)) 1) 
+                    )
+            )
+        )
+)
 
-(insertar 2 2 mat 5)
+(define (check_winner_row_aux matrix row)   
+    (cond 
+        ((equal? row (lar_list matrix)) #f)
+        ((not (check_row matrix row)) 
+            (check_winner_row_aux matrix (+ row 1))
+            )
+        (else #t)
+        )
+)
 
+(define (get_rest mat result)
+    (cond 
+        ((null? mat) result)
+        ((null? (cdar mat)) '())
+        (else
+            (get_rest (cdr mat) (append result (list (cdar mat))))
+        )
+    )
+)
+
+(define (get_col_aux matrix result) 
+    (cond 
+        ((null? matrix) result)
+        (else 
+            (get_col_aux (cdr matrix) (append result (list (caar matrix))))
+            )
+        )
+)
+
+(define (get_col matrix ncol) 
+    (cond 
+        ((zero? ncol) (get_col_aux matrix '()))
+        (else 
+            (get_col (get_rest matrix '()) (- ncol 1))
+            )
+        )
+)
+
+(define (check_col_aux row value pos) 
+    (cond 
+        ((zero? pos) #t)
+        ((equal? (get_val row pos) value) 
+            (check_col_aux row value (- pos 1))
+            )
+        (else 
+            #f
+            )
+        )
+)
+
+(define (check_col matrix col) 
+    (cond 
+        ((equal? col (lar_list matrix)) #f)
+        (else 
+            (check_col_aux (get_col matrix col) (get_val (get_col matrix col) 0) 
+                (- (lar_list (get_col matrix col)) 1)
+                )
+            )
+        )
+)
+
+(define (check_winner_col_aux matrix col) 
+    (cond 
+        ((equal? col (lar_list matrix)) #f)
+        ((not (check_col matrix col)) 
+            (check_winner_col_aux matrix (+ col 1))
+            )
+        (else #t)
+        )
+)
+
+(define (get_diag_top_aux matrix row col result) 
+    (cond 
+        ((or 
+            (equal? row (lar_list matrix)) (equal? col (lar_list (car matrix)))) 
+                result)
+        (else 
+            (get_diag_top_aux matrix (+ row 1) (+ col 1) (append result (list (get_val_mat matrix row col))))
+            )
+        )
+)
+
+(define (get_diag_top matrix col) 
+    (cond 
+        ((> col (- (lar_list (car matrix)) 3)) '())
+        (else 
+            (get_diag_top_aux matrix 0 col '())
+            )
+        )
+)
+
+(define (get_diag_bot_aux matrix row col result) 
+    (cond 
+        ((or 
+            (equal? row -1) (equal? col (lar_list (car matrix)))) 
+                result)
+        (else 
+            (get_diag_bot_aux matrix (- row 1) (+ col 1) (append result (list (get_val_mat matrix row col))))
+            )
+        )
+)
+
+(define (get_diag_bot matrix row) 
+    (cond 
+        ((< row (- (lar_list matrix) 3)) '())
+        (else 
+            (get_diag_bot_aux matrix row 0 '())
+            )
+        )
+)
+
+
+
+(define (check_winner matrix)
+    (cond 
+        ((check_winner_row_aux matrix 0) #t)
+        ((check_winner_col_aux matrix 0) #t)
+        ;((check_winner_diag_aux matrix 0) #t)
+        (else #f)
+        )
+)
+
+
+(define mat '((1 0 4) (0 3 0) (2 0 5) (6 7 8)))
+
+(get_diag_bot mat (- (lar_list mat) 2))
