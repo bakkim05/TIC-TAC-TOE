@@ -122,9 +122,288 @@
         )
 )
 
+;obtiene el valor en determinada posicion en una lista
+(define (get_val lista pos) 
+    (cond 
+        ((null? lista) lista)
+        ((zero? pos) (car lista))
+        (else 
+            (get_val (cdr lista) (- pos 1))
+            )
+        )
+)
 
+;obtiene el valor en determinada posicion en una matriz
+(define (get_val_mat matrix row col)
+    (get_val (get_val matrix row) col)
+)
 
+;funcion auxiliar 
+(define (lar_list_aux lista largo)
+    (cond
+        ((null? lista) largo)
+        (else (lar_list_aux (cdr lista) (+ largo 1)))
+    )
+)
 
+;funcion para obtener el largo de una lista
+(define (lar_list lista)
+    (cond
+        ((null? lista) 0)
+        (else (lar_list_aux (cdr lista) 1))
+    )
+)
+
+;funcion que devuelve la fila de una matriz. Recibe la matriz y el indice de la fila
+(define (get_row matrix nrow) 
+    (cond 
+        ((zero? nrow) (car matrix))
+        (else 
+            (get_row (cdr matrix) (- nrow 1))
+            )
+        )
+)
+
+;funcion auxiliar que recibe la fila, el valor a comprobar y el indice para recorrer la fila
+(define (check_row_aux row value pos) 
+    (cond 
+        ((zero? pos) #t)
+        ((equal? (get_val row pos) value) 
+            (check_row_aux row value (- pos 1))
+            )
+        (else 
+            #f
+            )
+        )
+)
+
+;verifica que en toda la fila exista el mismo valor
+(define (check_row matrix row) 
+    (cond 
+        ((equal? row (lar_list (car matrix))) #f)
+        (else 
+            (check_row_aux (get_row matrix row) (get_val (get_row matrix row) 0) 
+                (- (lar_list (get_row matrix row)) 1) 
+                    )
+            )
+        )
+)
+
+;funcion que itera sobre las filas de la matris para verificar si existe algun 
+;ganador. Recibe la matriz y el indice de la fila
+(define (check_winner_row_aux matrix row)   
+    (cond 
+        ((equal? row (lar_list matrix)) #f)
+        ((not (check_row matrix row)) 
+            (check_winner_row_aux matrix (+ row 1))
+            )
+        (else #t)
+        )
+)
+
+;funcion que elimina la primer columna de la matris, recibe la matriz original y una lista vacia
+(define (get_rest mat result)
+    (cond 
+        ((null? mat) result)
+        ((null? (cdar mat)) '())
+        (else
+            (get_rest (cdr mat) (append result (list (cdar mat))))
+        )
+    )
+)
+
+;funcion auxiliar para obtener la columna, recibe la matriz y una lista vacia
+(define (get_col_aux matrix result) 
+    (cond 
+        ((null? matrix) result)
+        (else 
+            (get_col_aux (cdr matrix) (append result (list (caar matrix))))
+            )
+        )
+)
+
+;funcion para obtener alguna columna de la matris. Recibe la matris y el indice de la columna
+(define (get_col matrix ncol) 
+    (cond 
+        ((zero? ncol) (get_col_aux matrix '()))
+        (else 
+            (get_col (get_rest matrix '()) (- ncol 1))
+            )
+        )
+)
+
+;funcion auxiliar que recibe la columna, el valor para compara y el indice
+(define (check_col_aux col value pos) 
+    (cond 
+        ((zero? pos) #t)
+        ((equal? (get_val col pos) value) 
+            (check_col_aux col value (- pos 1))
+            )
+        (else 
+            #f
+            )
+        )
+)
+
+;funcion para verificar si toda la columna posee el mismo valor, recibe la matris
+;y el indice de la columna
+(define (check_col matrix col) 
+    (cond 
+        ((equal? col (lar_list matrix)) #f)
+        (else 
+            (check_col_aux (get_col matrix col) (get_val (get_col matrix col) 0) 
+                (- (lar_list (get_col matrix col)) 1)
+                )
+            )
+        )
+)
+
+;funcion auxiliar para iterar sobre las columnas de la matris para buscar si hay
+;un gandor, recibe la matris y el numero de la columna
+(define (check_winner_col_aux matrix col) 
+    (cond 
+        ((equal? col (lar_list matrix)) #f)
+        ((not (check_col matrix col)) 
+            (check_winner_col_aux matrix (+ col 1))
+            )
+        (else #t)
+        )
+)
+
+;funcion auxiliar para obtener la diagonal desde arriba bajando hacia la derecha
+(define (get_diag_top_aux matrix row col result) 
+    (cond 
+        ((or 
+            (equal? row (lar_list matrix)) (equal? col (lar_list (car matrix)))) 
+                result)
+        (else 
+            (get_diag_top_aux matrix (+ row 1) (+ col 1) (append result (list (get_val_mat matrix row col))))
+            )
+        )
+)
+
+;funcion para obtener la diagonal, recibe la matris y el indice de columna para luego
+;ir dezplazando
+(define (get_diag_top matrix col) 
+    (cond 
+        ((> col (- (lar_list (car matrix)) 3)) '())
+        (else 
+            (get_diag_top_aux matrix 0 col '())
+            )
+        )
+)
+
+;funcion auxiliar para obtener la diagonal desde abajo subiendo hacia la derecha
+(define (get_diag_bot_aux matrix row col result) 
+    (cond 
+        ((or 
+            (equal? row -1) (equal? col (lar_list (car matrix)))) 
+                result)
+        (else 
+            (get_diag_bot_aux matrix (- row 1) (+ col 1) (append result (list (get_val_mat matrix row col))))
+            )
+        )
+)
+
+;funcion para obtener la diagonal desde abajo hacia la derecha, recibe la matris y
+;la fila desde donde empieza la diagonal
+(define (get_diag_bot matrix row) 
+    (cond 
+        ((< row (- (lar_list matrix) 3)) '())
+        (else 
+            (get_diag_bot_aux matrix row 0 '())
+            )
+        )
+)
+
+;funcion auxiliar para verificar si existe
+;algun ganador
+(define (check_diag_top_aux diag value pos) 
+    (cond 
+        ((zero? pos) #t)
+        ((equal? (get_val diag pos) value) 
+            (check_diag_top_aux diag value (- pos 1))
+            )
+        (else #f)
+    )
+)
+
+;funcion para verificar si toda la diagonal contiene el mismo symgolo
+(define (check_diag_top matrix diag) 
+    (cond 
+        ((equal? diag (lar_list matrix)) #f)
+        (else 
+            (check_diag_top_aux (get_diag_top matrix diag) (get_val (get_diag_top matrix diag) 0) 
+                (- (lar_list (get_diag_top matrix diag)) 1)
+                )
+            )
+        )
+)  
+
+;funcion auxiliar para iterar sobre las diagonales de la matriz
+(define (check_winner_diag_top_aux matrix diag) 
+    (cond 
+        ((> diag (- (lar_list (car matrix)) 3)) #f)
+        ((not (check_diag_top matrix diag)) 
+            (check_winner_diag_top_aux matrix (+ diag 1))
+            )
+        (else #t)
+        )
+)
+
+;funcion auxiliar para verificar si existe
+;algun ganador
+(define (check_diag_bot_aux diag value pos) 
+    (cond 
+        ((zero? pos) #t)
+        ((equal? (get_val diag pos) value) 
+            (check_diag_bot_aux diag value (- pos 1))
+            )
+        (else #f)
+    )
+)
+
+;funcion para verificar el valor de la diagonal
+(define (check_diag_bot matrix diag) 
+    (cond 
+        ((equal? diag (lar_list matrix)) #f)
+        (else 
+            (check_diag_bot_aux (get_diag_bot matrix diag) (get_val (get_diag_bot matrix diag) 0) 
+                (- (lar_list (get_diag_bot matrix diag)) 1)
+                )
+            )
+        )
+)
+
+;funcion para iterar sobre las diagonales para verificar el valor de la diagonal
+;vista desde abajo hacia arriba 
+(define (check_winner_diag_bot_aux matrix diag) 
+    (cond 
+        ((equal? diag -1) #f)
+        ((not (check_diag_bot matrix diag)) 
+            (check_winner_diag_bot_aux matrix (- diag 1))
+            )
+        (else #t)
+        )
+)
+
+;funcion para ver si existe algun jugador contemplando ultima jugada
+(define (check_winner matrix)
+    (cond 
+        ((check_winner_row_aux matrix 0) #t)
+        ((check_winner_col_aux matrix 0) #t)
+        ((check_winner_diag_top_aux matrix 0) #t)
+        ((check_winner_diag_bot_aux matrix (lar_list matrix)) #t)
+        (else #f)
+        )
+)
+
+(define (verificar matrix turno)
+  (cond
+    ((and (check_winner matrix) (eq? turno 1)) (msj WX)) ;falta funcion para parar el juego
+    ((and (check_winner matrix) (eq? turno 2)) (msj WO)) ;falta funcion para parar el juego
+    )
+  )
 
 
 
@@ -152,6 +431,8 @@
 (define margen 10)
 (define FT "Fuera del Tablero") ; variable que contiene el mensaje de Fuera del Tablero
 (define NP "No se puede poner ahi") ; variable que contiene el mensaje de Ya el campo esta ocupado
+(define WX "JUGADOR X GANO") ; variable que contiene el mensaje de gane para X.
+(define WO "JUGADOR X GANO") ; variable que contiene el mensaje de gane para O.
 
 ; lineas verticales
 (for ([h (in-range 10 cuadroX 80)])
@@ -231,6 +512,7 @@
   (cond
     ((equal? (left-mouse-click? (get-mouse-click z)) #f) (juego mInicial turno))
     (else
+     (verificar mInicial turno)
      (juego_aux mInicial turno (pos (posn-x (query-mouse-posn z))) (pos (posn-y (query-mouse-posn z))))
      )
     )
@@ -261,10 +543,4 @@
 
 ; corre el juego
 (juego (Crear_matriz cantidadY cantidadX '()) 2)
-
-
-
-
-
-;
 
