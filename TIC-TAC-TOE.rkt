@@ -167,6 +167,8 @@
 ;funcion auxiliar que recibe la fila, el valor a comprobar y el indice para recorrer la fila
 (define (check_row_aux row value pos) 
     (cond 
+        ((list? value) #f)
+        ((zero? value) #f)
         ((zero? pos) #t)
         ((equal? (get_val row pos) value) 
             (check_row_aux row value (- pos 1))
@@ -234,7 +236,9 @@
 
 ;funcion auxiliar que recibe la columna, el valor para compara y el indice
 (define (check_col_aux col value pos) 
-    (cond 
+    (cond
+        ((list? value) #f)
+        ((zero? value) #f)
         ((zero? pos) #t)
         ((equal? (get_val col pos) value) 
             (check_col_aux col value (- pos 1))
@@ -320,6 +324,8 @@
 ;algun ganador
 (define (check_diag_top_aux diag value pos) 
     (cond 
+        ((list? value) #f)
+        ((zero? value) #f)
         ((zero? pos) #t)
         ((equal? (get_val diag pos) value) 
             (check_diag_top_aux diag value (- pos 1))
@@ -355,6 +361,8 @@
 ;algun ganador
 (define (check_diag_bot_aux diag value pos) 
     (cond 
+        ((list? value) #f)
+        ((zero? value) #f)
         ((zero? pos) #t)
         ((equal? (get_val diag pos) value) 
             (check_diag_bot_aux diag value (- pos 1))
@@ -400,8 +408,8 @@
 
 (define (verificar matrix turno)
   (cond
-    ((and (check_winner matrix) (eq? turno 1)) (msj WX)) ;falta funcion para parar el juego
-    ((and (check_winner matrix) (eq? turno 2)) (msj WO)) ;falta funcion para parar el juego
+    ((and (check_winner matrix) (eq? turno 1)) (msj WO)) ;falta funcion para parar el juego
+    ((and (check_winner matrix) (eq? turno 2)) (msj WX)) ;falta funcion para parar el juego
     )
   )
 
@@ -432,7 +440,7 @@
 (define FT "Fuera del Tablero") ; variable que contiene el mensaje de Fuera del Tablero
 (define NP "No se puede poner ahi") ; variable que contiene el mensaje de Ya el campo esta ocupado
 (define WX "JUGADOR X GANO") ; variable que contiene el mensaje de gane para X.
-(define WO "JUGADOR X GANO") ; variable que contiene el mensaje de gane para O.
+(define WO "JUGADOR O GANO") ; variable que contiene el mensaje de gane para O.
 
 ; lineas verticales
 (for ([h (in-range 10 cuadroX 80)])
@@ -460,7 +468,7 @@
     (define a (+ (* i 80) margen))
     (define b (+ (* j 80) margen))
 
-    ((draw-pixmap p) "C:/Users/Juno/Desktop/REPOS/TIC-TAC-TOE/visuals/X.png" (make-posn (+ a 22) (+ b 15)))
+    ((draw-pixmap p) "/home/nicko/Documents/TIC-TAC-TOE/visuals/X.png" (make-posn (+ a 22) (+ b 15)))
     (copy-viewport p z)
     (lines)
     (sleep 1)
@@ -474,7 +482,7 @@
     (define a (+ (* i 80) margen))
     (define b (+ (* j 80) margen))
 
-    ((draw-pixmap p) "C:/Users/Juno/Desktop/REPOS/TIC-TAC-TOE/visuals/O.png" (make-posn (+ a 22) (+ b 15)))
+    ((draw-pixmap p) "/home/nicko/Documents/TIC-TAC-TOE/visuals/O.png" (make-posn (+ a 22) (+ b 15)))
     (copy-viewport p z)
     (lines)
     (sleep 1)
