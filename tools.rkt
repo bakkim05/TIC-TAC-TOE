@@ -112,6 +112,16 @@
     )
 )
 
+(define (get_row matrix nrow) 
+    (cond 
+        ((zero? nrow) (car matrix))
+        (else 
+            (get_row (cdr matrix) (- nrow 1))
+            )
+        )
+)
+
+#|
 ;in progress
 (define (check_winner matrix) 
     (cond 
@@ -119,16 +129,21 @@
         )
 )
 
+|#
+
 ;in progress
 (define (check_row matrix row) 
     (cond 
         ((equal? row (lar_list (car matrix))) #f)
         (else 
-            ;(check_row_aux matrix)
+            
             )
         )
 )
 
 (define listin (Crear_matriz 3 3 '()))
 (define listin2 '((1 2 3) (4 5 6)))
+(define mat '((1 2 1) (2 1 2) (1 2 1)))
+
+(insertar 2 2 mat 5)
 
