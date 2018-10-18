@@ -172,7 +172,7 @@
     (define a (+ (* i 80) margen))
     (define b (+ (* j 80) margen))
 
-    ((draw-pixmap p) "C:/Users/Oska/Desktop/REPOS/TIC TAC TOE/visuals/X.png" (make-posn (+ a 22) (+ b 15)))
+    ((draw-pixmap p) "C:/Users/Juno/Desktop/REPOS/TIC-TAC-TOE/visuals/X.png" (make-posn (+ a 22) (+ b 15)))
     (copy-viewport p z)
     (lines)
     (sleep 1)
@@ -186,7 +186,7 @@
     (define a (+ (* i 80) margen))
     (define b (+ (* j 80) margen))
 
-    ((draw-pixmap p) "C:/Users/Oska/Desktop/REPOS/TIC TAC TOE/visuals/O.png" (make-posn (+ a 22) (+ b 15)))
+    ((draw-pixmap p) "C:/Users/Juno/Desktop/REPOS/TIC-TAC-TOE/visuals/O.png" (make-posn (+ a 22) (+ b 15)))
     (copy-viewport p z)
     (lines)
     (sleep 1)
@@ -195,18 +195,17 @@
   )
 
 (define (lines)
+  ; lineas horizontales
+  (for ([v (in-range 10 cuadroY 80)])
+    ((draw-line z)(make-posn 10 v) (make-posn (+ dimensionI 10) v) "black")
+    )
   ; lineas verticales
   (for ([h (in-range 10 cuadroX 80)])
-  ((draw-line z)(make-posn h 10) (make-posn h (+ dimensionJ 10)) "black")
+    ((draw-line z)(make-posn h 10) (make-posn h (+ dimensionJ 10)) "black")
+    )
   )
 
-; lineas horizontales
-(for ([v (in-range 10 cuadroY 80)])
-  ((draw-line z)(make-posn 10 v) (make-posn (+ dimensionI 10) v) "black")
-  )
-  )
-
-; coodenadas del click
+; coodenadas del click truncadas para que se muestren de forma correcta
 (define (pos n)
   (truncate (/ (- n margen) 80))
   )
@@ -221,7 +220,7 @@
 
 ; comienza a jugar despues de un click
 (define (juego mInicial turno)
-  (print mInicial)
+  ;(print mInicial)
   (cond
     ((equal? (left-mouse-click? (get-mouse-click z)) #f) (juego mInicial turno))
     (else
@@ -240,7 +239,12 @@
 (define (reglas mInicial turno)
   (cond
     ((or (or (> (posn-x (query-mouse-posn z)) dimensionI) (< (posn-x (query-mouse-posn z)) margen)) (or (> (posn-y (query-mouse-posn z)) dimensionJ) (< (posn-y (query-mouse-posn z)) margen)))(msj FT) (juego mInicial turno))
-    ((or(compararMatrix_val (pos (posn-x (query-mouse-posn z))) (pos (posn-y (query-mouse-posn z))) mInicial 1)(compararMatrix_val (pos (posn-x (query-mouse-posn z))) (pos (posn-y (query-mouse-posn z))) mInicial 2)) (msj NP) (juego mInicial turno))
+    ((not(compararMatrix_val (pos (posn-y (query-mouse-posn z))) (pos (posn-x (query-mouse-posn z))) mInicial 0))
+        (msj NP)
+        (print (pos (posn-x (query-mouse-posn z))))
+        (print (pos (posn-y (query-mouse-posn z))))
+        (juego mInicial turno)
+        )
     (else
      (dibujarMarca (pos (posn-x (query-mouse-posn z)))(pos (posn-y (query-mouse-posn z))) turno mInicial)
      )
@@ -255,5 +259,5 @@
 
 
 
-
+;
 
