@@ -269,3 +269,5 @@
 (define mat '((1 0 4) (0 3 0) (2 0 5) (6 7 8)))
 
 (get_diag_bot mat (- (lar_list mat) 2))
+
+(provide (all-defined-out))
