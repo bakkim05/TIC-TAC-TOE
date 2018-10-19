@@ -121,6 +121,13 @@
             )
         )
 )
+
+
+
+
+
+
+
 #|--------------------------------------------------------------------------------------------------------------------------------------------|#
 #|                                                           ESTRUCTURA DEL JUEGO                                                             |#
 #|--------------------------------------------------------------------------------------------------------------------------------------------|#
@@ -224,29 +231,29 @@
   (cond
     ((equal? (left-mouse-click? (get-mouse-click z)) #f) (juego mInicial turno))
     (else
-     (juego_aux mInicial turno)
+     (juego_aux mInicial turno (pos (posn-x (query-mouse-posn z))) (pos (posn-y (query-mouse-posn z))))
      )
     )
 
   )
 
 ;funcion auxiliar para comenzar el juego
-(define (juego_aux mInicial turno)
-  (reglas mInicial turno)
+(define (juego_aux mInicial turno mouseX mouseY)
+  (reglas mInicial turno mouseX mouseY)
   )
 
 ; verifica las reglas
-(define (reglas mInicial turno)
+(define (reglas mInicial turno mouseX mouseY)
   (cond
     ((or (or (> (posn-x (query-mouse-posn z)) dimensionI) (< (posn-x (query-mouse-posn z)) margen)) (or (> (posn-y (query-mouse-posn z)) dimensionJ) (< (posn-y (query-mouse-posn z)) margen)))(msj FT) (juego mInicial turno))
-    ((not(compararMatrix_val (pos (posn-y (query-mouse-posn z))) (pos (posn-x (query-mouse-posn z))) mInicial 0))
+    ((not(compararMatrix_val mouseY mouseX mInicial 0))
         (msj NP)
         (print (pos (posn-x (query-mouse-posn z))))
         (print (pos (posn-y (query-mouse-posn z))))
         (juego mInicial turno)
         )
     (else
-     (dibujarMarca (pos (posn-x (query-mouse-posn z)))(pos (posn-y (query-mouse-posn z))) turno mInicial)
+     (dibujarMarca mouseX mouseY turno mInicial)
      )
     )
   )
