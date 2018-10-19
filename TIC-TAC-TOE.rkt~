@@ -359,9 +359,8 @@
 
 ;funcion auxiliar para verificar si existe
 ;algun ganador
-(define (check_diag_bot_aux diag value pos)
-    (cond
-      ((<= (lar_list diag) 2) #f)
+(define (check_diag_bot_aux diag value pos) 
+    (cond 
         ((list? value) #f)
         ((zero? value) #f)
         ((zero? pos) #t)
@@ -373,9 +372,9 @@
 )
 
 ;funcion para verificar el valor de la diagonal
-(define (check_diag_bot matrix diag)
+(define (check_diag_bot matrix diag) 
     (cond 
-        ((equal? diag 1) #f)
+        ((equal? diag (lar_list matrix)) #f)
         (else 
             (check_diag_bot_aux (get_diag_bot matrix diag) (get_val (get_diag_bot matrix diag) 0) 
                 (- (lar_list (get_diag_bot matrix diag)) 1)
@@ -396,14 +395,13 @@
         )
 )
 
-
 ;funcion para ver si existe algun jugador contemplando ultima jugada
 (define (check_winner matrix)
     (cond 
         ((check_winner_row_aux matrix 0) #t)
         ((check_winner_col_aux matrix 0) #t)
         ((check_winner_diag_top_aux matrix 0) #t)
-        ((check_winner_diag_bot_aux matrix (- (lar_list matrix) 1)) #t)
+        ((check_winner_diag_bot_aux matrix (lar_list matrix)) #t)
         (else #f)
         )
 )
@@ -420,7 +418,7 @@
 #|--------------------------------------------------------------------------------------------------------------------------------------------|#
 #|                                                           ESTRUCTURA DEL JUEGO                                                             |#
 #|--------------------------------------------------------------------------------------------------------------------------------------------|#
-        
+
 (define cantidadX 3) ; cantidad de cuadros en el eje FILAS
 (define cantidadY 3) ; cantidad de cuadros en el eje COLUMNAS
 
@@ -518,6 +516,7 @@
 
 ; comienza a jugar despues de un click
 (define (juego mInicial turno)
+  ;(print mInicial)
   (cond
     ((equal? (left-mouse-click? (get-mouse-click z)) #f) (juego mInicial turno))
     (else
@@ -539,6 +538,8 @@
     ((or (or (> (posn-x (query-mouse-posn z)) dimensionI) (< (posn-x (query-mouse-posn z)) margen)) (or (> (posn-y (query-mouse-posn z)) dimensionJ) (< (posn-y (query-mouse-posn z)) margen)))(msj FT) (juego mInicial turno))
     ((not(compararMatrix_val mouseY mouseX mInicial 0))
         (msj NP)
+        (print (pos (posn-x (query-mouse-posn z))))
+        (print (pos (posn-y (query-mouse-posn z))))
         (juego mInicial turno)
         )
     (else
